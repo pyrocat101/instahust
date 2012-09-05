@@ -14,6 +14,15 @@ handlers:
 - url: /.*
   script: main.py
 
-# skip_files:
-# - ^(.*/)?local_settings\.py
-# - ^(.*/)?local_weibo\.ini
+skip_files:
+- ^(.*/)?app\.yaml
+- ^(.*/)?app\.yml
+- ^(.*/)?index\.yaml
+- ^(.*/)?index\.yml
+- ^(.*/)?#.*#
+- ^(.*/)?.*~
+- ^(.*/)?.*\.py[co]
+- ^(.*/)?.*/RCS/.*
+- ^(.*/)?\..*
+- ^(.*/)?local_settings\.py
+- ^(.*/)?local_weibo\.ini
