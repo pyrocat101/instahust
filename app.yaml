@@ -8,21 +8,13 @@ handlers:
   static_files: static/favicon.ico
   upload: static/favicon.ico
 
-- url: /css
-  static_dir: static/css
+# - url: /css
+#   static_dir: static/css
 
 - url: /.*
   script: main.py
 
 skip_files:
-- ^(.*/)?app\.yaml
-- ^(.*/)?app\.yml
-- ^(.*/)?index\.yaml
-- ^(.*/)?index\.yml
-- ^(.*/)?#.*#
-- ^(.*/)?.*~
 - ^(.*/)?.*\.py[co]
-- ^(.*/)?.*/RCS/.*
-- ^(.*/)?\..*
 - ^(.*/)?local_settings\.py
 - ^(.*/)?local_weibo\.ini

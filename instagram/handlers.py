@@ -94,26 +94,6 @@ class InstagramLoadUser(webapp.RequestHandler):
         self.redirect("/")
 
 
-# class InstagramSubscribe(webapp.RequestHandler):
-#     def get(self):
-#         from urllib import urlencode
-#         from httplib2 import Http
-
-#         subscriptions_url = "https://api.instagram.com/v1/subscriptions"
-
-#         data = {
-#             "client_id": settings.INSTAGRAM_CONFIG["client_id"],
-#             "client_secret": settings.INSTAGRAM_CONFIG["client_secret"],
-#             "callback_url": settings.INSTAGRAM_PUSH_CALLBACK,
-#             "aspect": "media",
-#             "object": "user"
-#         }
-
-#         http_object = Http(timeout = 20)
-#         response, content = http_object.request(
-#                 subscriptions_url, "POST", urlencode(data))
-
-
 class InstagramPushCallback(webapp.RequestHandler):
     def get(self):
         challenge = self.request.get("hub.challenge")
@@ -125,12 +105,15 @@ class InstagramPushCallback(webapp.RequestHandler):
         import hashlib
         import hmac
         import logging
+        import re
         from StringIO import StringIO
         from time import time
         from urllib2 import urlopen
         from django.utils import simplejson
-        #from dropbox import helper as dropbox_helper
+
         from weibo import helper as weibo_helper
+
+        logging.info("========PUSHED=======\n")
 
         payload = self.request.body
 
@@ -163,39 +146,21 @@ class InstagramPushCallback(webapp.RequestHandler):
             media, _ = instagram_client.user_recent_media(count = 1)
             media = media[0]
 
-            logging.info("=========HIT FILTER=========\n")
-
-            # Filter
+            # filter
             if "instahust" not in map(lambda x: x.name, media.tags): return
-
-            logging.info("=========AFTER FILTER=========\n")
 
             media_file = urlopen(media.images['standard_resolution'].url)
             media_data = media_file.read()
 
-            # Picture
             pic_file = StringIO(media_data)
-            # Text
             weibo_text = media.caption.text
-            # Author
+            # rip hashtag & strip whitespace
+            weibo_text = re.sub(r"#(\w+)", "", weibo_text).strip()
             instagram_author = media.user.username
-            # URL
             instagram_url = media.link
 
-            logging.info("\n=========START MEDIA============\n")
-            logging.info(weibo_text)
-            logging.info('\n')
-            logging.info(instagram_author)
-            logging.info('\n')
-            logging.info(instagram_url)
-            logging.info('\n')
-            logging.info("=========END MEDIA============\n")
-
-            # Weibo Content
             weibo_content = u"#instahust#%s (by %s) %s" % \
                             (weibo_text, instagram_author, instagram_url)
 
-            logging.info(weibo_content)
-
-            weibo_client = weibo_helper.authenticated_client(profile)
+            weibo_client = weibo_helper.authenticated_client()
             weibo_client.upload.statuses__upload(status=weibo_content, pic=pic_file)

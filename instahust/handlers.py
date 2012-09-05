@@ -15,11 +15,10 @@ class WelcomeHandler(webapp.RequestHandler):
         profiles.filter("ig_user_id =", ig_user_id)
         profile = profiles.get()
 
-        if profile and profile.fully_connected():
+        if profile:
             self.render_template("connected.html")
         else:
             self.render_template("not_connected.html", {
-                "profile": profile,
                 "client_id": settings.INSTAGRAM_CONFIG["client_id"]
             })
 
@@ -34,11 +33,7 @@ class ConnectHandler(webapp.RequestHandler):
         profiles.filter("ig_user_id =", ig_user_id)
         profile = profiles.get()
 
-        if profile and profile.weibo_access_token_key and \
-                       profile.weibo_access_token_expire:
+        if profile:
             self.redirect("/")
-        elif profile and not (profile.weibo_access_token_key or
-                              profile.weibo_access_token_expire):
-            self.redirect("/weibo/auth")
         else:
             self.redirect("/instagram/auth")

@@ -1,20 +1,21 @@
-from dropbox import helper as dropbox_helper
-
 COOKIE_SECRET = "958070f945fd4XxxSOMETHING_RANDOMxXX570f945fd4"
-
-INSTAGRAM_REDIRECT_URI = "http://example.appspot.com/instagram/callback"
-INSTAGRAM_PUSH_CALLBACK = "http://example.appspot.com/instagram/push_callback"
+INSTAGRAM_REDIRECT_URI = "http://instahust.appspot.com/instagram/callback"
+INSTAGRAM_PUSH_CALLBACK = "http://instahust.appspot.com/instagram/push_callback"
 INSTAGRAM_CONFIG = {
         "client_id": "CLIENT_ID",
         "client_secret": "CLIENT_SECRET",
         "redirect_uri": INSTAGRAM_REDIRECT_URI
 }
 
-DROPBOX_CALLBACK = "http://example.appspot.com/dropbox/callback"
-DROPBOX_CONFIG = dropbox_helper.load_config("prod_dropbox.ini")
-
+WEIBO_CONFIG = {
+		"app_key": "APP_KEY",
+		"app_secret": "APP_SECRET",
+		"redirect_uri": "http://url/to/redir"
+}
+WEIBO_ACCESS_TOKEN = "YOUR_WEIBO_ACCESS_TOKEN"
+WEIBO_ACCESS_TOKEN_EXPIRE = 1346935374
 
 try:
     from local_settings import *
-except ImportError:
+except ImportError, e:
     pass
