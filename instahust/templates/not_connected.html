@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>InstaHUST</title>
+</head>
+<body style="font-family:'Helvetica Neue'">
+<!--     <a href="http://github.com/Instagram/Instadrop"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://assets1.github.com/img/e6bef7a091f5f3138b8cd40bc3e114258dd68ddf?repo=&url=http%3A%2F%2Fs3.amazonaws.com%2Fgithub%2Fribbons%2Fforkme_right_red_aa0000.png&path=" alt="Fork me on GitHub"></a> -->
+    <div style="margin:50px auto;width:550px;position:relative">
+        <h1>
+        {% if profile %}
+            Almost...
+        {% else %}
+            Hello there.
+        {% endif %}
+        </h1>
+        <h1>
+            InstaHUST用于连接您的Instagram账号到新浪微博账号。一旦连接成功，
+            InstaHUST会自动将您的照片中带有#InstaHUST标签的照片同步到新浪微
+            博。
+            <br /> <br />
+        </h1>
+        {% if profile and profile.instagram_connected and not profile.weibo_connected %}
+            <h3>
+                好极了！我们已经连接了您的Instagram账号。
+                 <br /> <br />
+                One last step: <a href="/weibo/auth">连接新浪微博</a>.
+            </h3>
+            <div style="position:absolute;right:0">
+                <h4><a href="/instagram/disconnect">断开与Instagram的连接</a></h4>
+            </div>
+        {% else %}
+            <h1>
+                听起来不错？那么开始吧！ <br />
+                <a href="javascript:;" onclick="do_login();">连接到您的Instagram账号</a>
+            </h1>
+            <div id="ig-root"></div>
+            <script>
+                function do_login() {
+                    IG.login(function (response) {
+                        if (response.code) {
+                            document.location = '/instagram/callback?code=' + response.code;
+                        } else if (response.session) {
+                            document.location = '/instagram/load_user?ig_user_id=' + response.session.id;
+                        }
+                    }, {
+                        response_type: 'code',
+                        scope: ['comments', 'likes', 'relationships']
+                    });
+                }
+
+                window.igAsyncInit = function() {
+                    IG.init({
+                        client_id: '{{ client_id }}',
+                        logging: true,
+                        check_status: false
+                    });
+                };
+
+                (function() {
+                    var e = document.createElement('script'); e.async = true;
+                    e.src = document.location.protocol +
+                        '//github.com/Instagram/instagram-javascript-sdk/raw/master/ig-min.js';
+                    document.getElementById('ig-root').appendChild(e);
+                }());
+            </script>
+        {% endif %}
+    </div>
+</body>
