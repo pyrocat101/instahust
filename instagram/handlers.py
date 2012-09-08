@@ -111,7 +111,7 @@ class InstagramPushCallback(webapp.RequestHandler):
         from urllib2 import urlopen
         from django.utils import simplejson
 
-        from weibo import helper as weibo_helper
+        from weibo import APIClient
 
         payload = self.request.body
 
@@ -160,5 +160,5 @@ class InstagramPushCallback(webapp.RequestHandler):
             weibo_content = u"#instahust#%s (by %s) %s" % \
                             (weibo_text, instagram_author, instagram_url)
 
-            weibo_client = weibo_helper.authenticated_client()
-            weibo_client.upload.statuses__upload(status=weibo_content, pic=pic_file)
+            weibo_client = APIClient(settings.WEIBO_GSID)
+            weibo_client.post(content=weibo_content, pic=pic_file)

@@ -6,10 +6,4 @@ INSTAGRAM_CONFIG = {
         "redirect_uri": INSTAGRAM_REDIRECT_URI
 }
 
-WEIBO_CONFIG = {
-		"app_key": "APP_KEY",
-		"app_secret": "APP_SECRET",
-		"redirect_uri": "http://url/to/redir"
-}
-WEIBO_ACCESS_TOKEN = "YOUR_WEIBO_ACCESS_TOKEN"
-WEIBO_ACCESS_TOKEN_EXPIRE = 1346935374
+WEIBO_GSID = "YOUR weibo.cn gsid"
