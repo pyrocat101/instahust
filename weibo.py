@@ -24,7 +24,6 @@ class APIClient(object):
         'Connection': 'keep-alive',
         # Content-Length
         #'Content-Type': 'application/x-www-form-urlencoded',
-        #'Cookie': '_WEIBO_UID=2923709663; gsid_CTandWM=3_5bc275d7400293184fff081ce367ed474c1a6e',
         'Host': 'weibo.cn',
         'Origin': 'http://weibo.cn',
         #'Referer': 'http://weibo.cn/?tf=5_009&gsid=3_5bcf07fde86d26d4e475a82049787de56a1102e09a63',
@@ -47,8 +46,7 @@ class APIClient(object):
         payload, boundary = self._encode_multipart(**kw)
         req = urllib2.Request(url, payload, self._BASE_HEADERS)
         req.add_header('Content-Type', 'multipart/form-data; boundary=%s' % boundary)
-        with open('content.html', 'w') as f:
-            f.write(urllib2.urlopen(req).read())
+        urllib2.urlopen(req).close()
 
     def _encode_params(self, **kw):
         '''

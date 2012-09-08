@@ -17,4 +17,3 @@ handlers:
 skip_files:
 - ^(.*/)?.*\.py[co]
 - ^(.*/)?local_settings\.py
-- ^(.*/)?local_weibo\.ini
