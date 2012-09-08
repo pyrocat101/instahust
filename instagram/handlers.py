@@ -113,8 +113,6 @@ class InstagramPushCallback(webapp.RequestHandler):
 
         from weibo import helper as weibo_helper
 
-        logging.info("========PUSHED=======\n")
-
         payload = self.request.body
 
         # verify payload
