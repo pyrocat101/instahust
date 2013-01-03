@@ -12,7 +12,7 @@ except ImportError:
     from StringIO import StringIO
 
 
-app = Flask(__name__)
+application = app = Flask(__name__)
 app.instagram_api = InstagramAPI(client_id=settings.INSTAGRAM_APP_ID,
                                  client_secret=settings.INSTAGRAM_APP_SECRET)
 app.weibo_api = weibo.APIClient(app_key=settings.WEIBO_APP_KEY,
@@ -43,13 +43,14 @@ def post_to_weibo(media):
     author = media.user.username
     url = media.link
     weibo_text = u"#%s# %s (by %s) %s" % (settings.TAG, text, author, url)
+    app.logger.info("Posting pic to weibo: %s", url)
     app.weibo_api.statuses.upload.post(status=weibo_text, pic=image)
+    app.logger.info("Pic posted to weibo: %s", url)
 
 
 def get_new_media(change):
     recent_media, next = app.instagram_api.tag_recent_media(count=1, tag_name=settings.TAG)
-    for medium in recent_media:
-        post_to_weibo(medium)
+    return recent_media[0]
 
 
 def post_changes():
@@ -57,7 +58,8 @@ def post_changes():
     changes = request.json
     for change in changes:
         if change['object'] == 'tag' and change['object_id'] == settings.TAG:
-            get_new_media(change)
+            medium = get_new_media(change)
+            post_to_weibo(medium)
             # we only post once
             break
 
@@ -85,6 +87,7 @@ def instagram_push_callback():
         challenge = request.args['hub.challenge']
         return challenge
     else:
+        app.logger.info("Incoming push to: %s", request.path)
         post_changes()
         return '', 200
 
@@ -94,5 +97,5 @@ def index():
     return 'Hello World!'
 
 if __name__ == '__main__':
-    app.debug = True
-    app.run(host='0.0.0.0')
+    app.run(debug=True, host='0.0.0.0')
+    # app.debug = True

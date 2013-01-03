@@ -1,7 +1,8 @@
 fabfile.py
 venv/*
 .sublime-*
-.py[co]
+.pyc
+.pyo
 *~
 .*
 local_settings.py

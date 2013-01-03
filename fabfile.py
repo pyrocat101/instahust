@@ -5,7 +5,8 @@ from pygments import highlight
 from pygments.lexers import JSONLexer
 from pygments.formatters import Terminal256Formatter
 from settings import *
-from local_settings import INSTAGRAM_PUSH_CALLBACK_URL as INSTAGRAM_PUSH_CALLBACK_URL_LOCAL
+import local_settings
+import remote_settings
 
 INSTAGRAM_SUB_URL = "https://api.instagram.com/v1/subscriptions"
 INSTAGRAM_TAG_BASE = "https://api.instagram.com/v1/tags"
@@ -48,14 +49,14 @@ def reset_subscription_local():
         'object': 'tag',
         'aspect': 'media',
         'object_id': TAG,
-        'callback_url': INSTAGRAM_PUSH_CALLBACK_URL_LOCAL
+        'callback_url': local_settings.INSTAGRAM_PUSH_CALLBACK_URL
     }
     r = requests.post(INSTAGRAM_SUB_URL, data=payload)
     print(format_json(r.json))
 
 
 @task(alias='rsub_remote')
-def reset_subscription_local():
+def reset_subscription_remote():
     del_subscription()
     payload = {
         'client_secret': INSTAGRAM_APP_SECRET,
@@ -63,7 +64,7 @@ def reset_subscription_local():
         'object': 'tag',
         'aspect': 'media',
         'object_id': TAG,
-        'callback_url': INSTAGRAM_PUSH_CALLBACK_URL
+        'callback_url': remote_settings.INSTAGRAM_PUSH_CALLBACK_URL
     }
     r = requests.post(INSTAGRAM_SUB_URL, data=payload)
     print(format_json(r.json))
