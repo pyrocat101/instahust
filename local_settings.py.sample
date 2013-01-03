@@ -1,9 +1,0 @@
-INSTAGRAM_REDIRECT_URI = "http://xxxx.localtunnel.com/instagram/callback"
-INSTAGRAM_PUSH_CALLBACK = "http://xxxx.localtunnel.com/instagram/push_callback"
-INSTAGRAM_CONFIG = {
-        "client_id": "CLIENT_ID",
-        "client_secret": "CLIENT_SECRET",
-        "redirect_uri": INSTAGRAM_REDIRECT_URI
-}
-
-WEIBO_GSID = "YOUR weibo.cn gsid"

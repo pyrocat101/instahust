@@ -1,0 +1,7 @@
+fabfile.py
+venv/*
+.sublime-*
+.py[co]
+*~
+.*
+local_settings.py

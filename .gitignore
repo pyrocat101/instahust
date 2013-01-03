@@ -2,5 +2,8 @@
 *~
 .DS_Store
 settings.py
+remote_settings.py
 local_settings.py
 /_private
+*.sublime-*
+venv
