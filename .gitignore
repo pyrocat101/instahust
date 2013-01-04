@@ -7,3 +7,4 @@ local_settings.py
 /_private
 *.sublime-*
 venv
+tools/auth_info.json
