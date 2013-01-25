@@ -1,10 +1,11 @@
 # Phantom.js script for weibo access token refresh.
-# Use crontab to run this task per 12h. (TTL of an access token is 24h) 
+# Use crontab to run this task per 12h. (TTL of an access token is 24h)
 
 webpage = require 'webpage'
 fs = require 'fs'
 
-LOGIN_URL = 'http://instahust.ap01.aws.af.cm/weibo_login'
+BASE_URL = 'http://instahust.ap01.aws.af.cm/'
+LOGIN_URL = "#{BASE_URL}weibo_login"
 
 log = (msg) -> console.log "[#{new Date()}] #{msg}"
 read_auth_info = -> JSON.parse fs.read 'auth_info.json'
@@ -19,6 +20,13 @@ do_the_auth = (auth_url) ->
       phantom.exit()
     else
       log "Auth page loaded correctly."
+
+      auth_page.onLoadFinished = (status) ->
+        log "Navigated to #{auth_page.url}"
+        if auth_page.url isnt BASE_URL
+          log 'Error returning Oauth callback page!'
+        phantom.exit()
+
       auth_btn = auth_page.evaluate (auth_info) ->
         document.querySelector('#userId').value = auth_info.username
         document.querySelector('#passwd').value = auth_info.password
@@ -29,11 +37,10 @@ do_the_auth = (auth_url) ->
         auth_btn.dispatchEvent evObj
       , auth_info
       log 'Clicked login button.'
-      phantom.exit()
 
 weibo_login = ->
   login_page = webpage.create()
-  log 'Opening weibo_login...' 
+  log 'Opening weibo_login...'
   login_page.open LOGIN_URL, (status) ->
     if status isnt 'success'
       log "Unable to open URL: #{LOGIN_URL}"
@@ -47,9 +54,9 @@ weibo_login = ->
       do_the_auth(auth_url)
 
 phantom.onError = (msg, trace) ->
-  msgStack = ['PHANTOM ERROR: ' + msg];
+  msgStack = ['PHANTOM ERROR: ' + msg]
   if trace
-    msgStack.push('TRACE:');
+    msgStack.push('TRACE:')
     trace.forEach (t) ->
       msgStack.push " -> #{t.file or t.sourceURL}: #{t.line}#{' (in function ' + t.function + ')' if t.function}"
   console.error msgStack.join '\n'
