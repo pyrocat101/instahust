@@ -33,7 +33,7 @@ def verify_payload():
 
 
 def rip_hash_tags(text):
-    return re.sub(r"#(\w+)", "", text).strip()
+    return re.sub(r"[#@](\S+)\s?", "", text).strip()
 
 
 def post_to_weibo(media):
