@@ -1,10 +1,13 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, abort
 import settings
+import sys
 import re
 import hmac
 import hashlib
 import weibo
 import requests
+import dateutil.tz
+import datetime
 from instagram import InstagramAPI
 try:
     from cStringIO import StringIO
@@ -19,6 +22,26 @@ app.weibo_api = weibo.APIClient(app_key=settings.WEIBO_APP_KEY,
                                 app_secret=settings.WEIBO_APP_SECRET,
                                 redirect_uri=settings.WEIBO_REDIR_URL)
 
+local_tz = dateutil.tz.tzlocal()
+
+def log(level, fmt, *args, **kwargs):
+    now = datetime.datetime.now().replace(tzinfo=local_tz)
+    now = now.strftime("%Y-%m-%d %H:%M:%S%z")
+    print>>sys.stderr, "%s [%s] %s" % (now, level.upper(), fmt % tuple(args))
+
+def debug(fmt, *args, **kwargs):
+    log('DEBUG', *args, **kwargs)
+
+def info(fmt, *args, **kwargs):
+    log('INFO', *args, **kwargs)
+
+def warn(fmt, *args, **kwargs):
+    log('WARNING', *args, **kwargs)
+
+def error(fmt, *args, **kwargs):
+    log('ERROR', *args, **kwargs)
+
+
 def verify_payload():
     payload = request.data
     signature = request.headers['X-Hub-Signature']
@@ -28,7 +51,7 @@ def verify_payload():
                            digestmod=hashlib.sha1)
     digest = hashing_obj.hexdigest()
     if digest != signature:
-        app.logger.warning("Digest and signature differ. (%s, %s)", digest, signature)
+        warn("Digest and signature differ. (%s, %s)", digest, signature)
         abort(500)
 
 
@@ -39,13 +62,16 @@ def rip_hash_tags(text):
 def post_to_weibo(media):
     r = requests.get(media.images['standard_resolution'].url)
     image = StringIO(r.content)
-    text = rip_hash_tags(media.caption.text)
+    if media.caption:
+        text = rip_hash_tags(media.caption.text)
+    else:
+        text = ""
     author = media.user.username
     url = media.link
     weibo_text = u"#%s# %s (by %s) %s" % (settings.TAG, text, author, url)
-    app.logger.info("Posting pic to weibo: %s", url)
+    info("Posting pic to weibo: %s", url)
     app.weibo_api.statuses.upload.post(status=weibo_text, pic=image)
-    app.logger.info("Pic posted to weibo: %s", url)
+    info("Pic posted to weibo: %s", url)
 
 
 def get_new_media(change):
@@ -66,7 +92,6 @@ def post_changes():
 
 @app.route('/weibo_login', methods=['GET'])
 def weibo_login():
-    # TODO: Put a fucking button here!
     auth_url = app.weibo_api.get_authorize_url()
     return render_template('weibo_login.html', auth_url=auth_url)
 
@@ -87,7 +112,7 @@ def instagram_push_callback():
         challenge = request.args['hub.challenge']
         return challenge
     else:
-        app.logger.info("Incoming push to: %s", request.path)
+        info("Incoming push to: %s", request.path)
         post_changes()
         return '', 200
 
