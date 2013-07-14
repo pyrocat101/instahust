@@ -30,16 +30,16 @@ def log(level, fmt, *args, **kwargs):
     print>>sys.stderr, "%s [%s] %s" % (now, level.upper(), fmt % tuple(args))
 
 def debug(fmt, *args, **kwargs):
-    log('DEBUG', *args, **kwargs)
+    log('DEBUG', fmt, *args, **kwargs)
 
 def info(fmt, *args, **kwargs):
-    log('INFO', *args, **kwargs)
+    log('INFO', fmt, *args, **kwargs)
 
 def warn(fmt, *args, **kwargs):
-    log('WARNING', *args, **kwargs)
+    log('WARNING', fmt, *args, **kwargs)
 
 def error(fmt, *args, **kwargs):
-    log('ERROR', *args, **kwargs)
+    log('ERROR', fmt, *args, **kwargs)
 
 
 def verify_payload():
