@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, abort
 import settings
+import os
 import sys
 import re
 import hmac
@@ -18,9 +19,12 @@ except ImportError:
 application = app = Flask(__name__)
 app.instagram_api = InstagramAPI(client_id=settings.INSTAGRAM_APP_ID,
                                  client_secret=settings.INSTAGRAM_APP_SECRET)
-app.weibo_api = weibo.APIClient(app_key=settings.WEIBO_APP_KEY,
-                                app_secret=settings.WEIBO_APP_SECRET,
-                                redirect_uri=settings.WEIBO_REDIR_URL)
+# app.weibo_api = weibo.APIClient(app_key=settings.WEIBO_APP_KEY,
+#                                 app_secret=settings.WEIBO_APP_SECRET,
+#                                 redirect_uri=settings.WEIBO_REDIR_URL)
+app.weibo_api = weibo.APIClient('', '', '')
+app.weibo_api.set_access_token(settings.WEIBO_ACCESS_TOKEN, sys.maxint)
+
 
 local_tz = dateutil.tz.tzlocal()
 
@@ -90,20 +94,20 @@ def post_changes():
             break
 
 
-@app.route('/weibo_login', methods=['GET'])
-def weibo_login():
-    auth_url = app.weibo_api.get_authorize_url()
-    return render_template('weibo_login.html', auth_url=auth_url)
+# @app.route('/weibo_login', methods=['GET'])
+# def weibo_login():
+#     auth_url = app.weibo_api.get_authorize_url()
+#     return render_template('weibo_login.html', auth_url=auth_url)
 
 
-@app.route('/weibo_oauth_callback', methods=['GET'])
-def weibo_oauth_callback():
-    code = request.args['code']
-    r = app.weibo_api.request_access_token(code)
-    access_token = r.access_token
-    expires_in = r.expires_in
-    app.weibo_api.set_access_token(access_token, expires_in)
-    return redirect(url_for('index'))
+# @app.route('/weibo_oauth_callback', methods=['GET'])
+# def weibo_oauth_callback():
+#     code = request.args['code']
+#     r = app.weibo_api.request_access_token(code)
+#     access_token = r.access_token
+#     expires_in = r.expires_in
+#     app.weibo_api.set_access_token(access_token, expires_in)
+#     return redirect(url_for('index'))
 
 
 @app.route('/instagram_push_callback', methods=['GET', 'POST'])
@@ -121,6 +125,8 @@ def instagram_push_callback():
 def index():
     return 'Hello World!'
 
+
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0')
-    # app.debug = True
+    if os.environ.get('DEBUG'):
+        app.debug = True
+    app.run(host='0.0.0.0')
